@@ -1,0 +1,40 @@
+#pragma once
+
+
+//---------------------------------------------------
+// put keys here (flurry, GA, etc)
+#define kAnalytics_gaKey	@"<<PUT YOUR GA KEY HERE IF NEEDED>>"		
+
+
+//---------------------------------------------------
+// pages
+//TODO: define your own
+#define kPage_mainView						@"main_view"
+#define kPage_anotherView					@"another_view"
+#define kPage_tutorial						@"tutorial_view"
+#define kPage_help							@"help_view"
+
+
+//---------------------------------------------------
+// events
+
+
+
+// track sharing actions - posted on dialog button tap
+#define kEventCat_share						@"sharing"
+	#define kEventAction_shareFacebook			@"share_facebook"
+	#define kEventAction_shareMail				@"share_mail"
+
+// These are triggered when user taps button response in iRate
+#define kEventCat_rate						@"ratings"
+	#define kEventAction_rateYes				@"rate_yes"
+	#define kEventAction_rateNo					@"rate_no"
+	#define kEventAction_rateDefer				@"rate_defer"
+
+
+
+
+
+
+
+

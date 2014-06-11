@@ -1,0 +1,28 @@
+WRLib is dependent on the following libraries:
+
+1. SSKeychain - https://github.com/soffes/sskeychain
+You will need this for WRUUID
+
+2. AFNetworking - https://github.com/AFNetworking/AFNetworking
+Required for image cache, facebook helper and others.
+
+
+These additional categories were included as part of the command WRLib categories:
+
+* CBFrameHelpers -  https://github.com/cameron/uiview-frame-helpers
+* MKBlockAdditions -  https://github.com/MugunthKumar/UIKitCategoryAdditions/tree/master/MKAdditions
+
+
+UIView+CBFrameHelpers license
+---------------------------------------
+Copyright (c) 2012 Cameron Boehmer
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+MKBlockAdditions "license"
+-----------------------------------
+Do whatever you want to do with this code. But don't remove the attribution from the source code while re-distribution.
