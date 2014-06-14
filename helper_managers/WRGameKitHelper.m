@@ -95,7 +95,7 @@
 
     GKLocalPlayer* localPlayer = [GKLocalPlayer localPlayer];
 	
-    __block __typeof__(self) bself = self;
+    __weak __typeof__(self) bself = self;
 	__weak GKLocalPlayer* bLocalPlayer = localPlayer;
 	
 	// this will kick off authentication
@@ -152,7 +152,7 @@
 	[[NSNotificationCenter defaultCenter] postNotificationName:kWRGameKitHelperNotif_userLoggedIn object:localPlayer];
 	
 	// start retreiving friends
-	__block __typeof__(self) bself = self;
+	__weak __typeof__(self) bself = self;
 	[_mLocalPlayer loadFriendsWithCompletionHandler:^(NSArray *friendIDs, NSError *error) {
 		if(friendIDs) {
 			[bself setFriendIds:friendIDs];
@@ -231,7 +231,7 @@
     }
 
 	
-    __block __typeof__(self) bself = self;
+    __weak __typeof__(self) bself = self;
     GKAchievement *achievement = [[GKAchievement alloc] initWithIdentifier:achievementId];
     
     if (achievement)
@@ -387,7 +387,7 @@
     WRDebugLog(@"WRGameKitHelper: Attempting to report %lu cached achievements...", (unsigned long)achievements.count);
     
 	// ios 6+ only
-	__block __typeof__(self) bself = self;
+	__weak __typeof__(self) bself = self;
 	[GKAchievement reportAchievements:achievements withCompletionHandler:^(NSError *error) {
 		if (!error)
 		{

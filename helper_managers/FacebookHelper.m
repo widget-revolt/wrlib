@@ -126,7 +126,7 @@ static FacebookHelper* gSharedInstance_FacebookHelper = nil;
 //==============================================================
 - (void) loadFriends
 {
-	__block __typeof__(self) bself = self;
+	__weak __typeof__(self) bself = self;
 	[FBRequestConnection startForMyFriendsWithCompletionHandler:
 		^(FBRequestConnection *connection, id result, NSError *error)
 		 {
@@ -179,7 +179,7 @@ static FacebookHelper* gSharedInstance_FacebookHelper = nil;
 							 linkUrl:(NSString*)linkUrl
 						  completion:(FacebookHelperFeedCompletion)completion
 {
-	__block __typeof__(self) bself = self;
+	__weak __typeof__(self) bself = self;
 	
 	// if we are not logged in, we need to start a login and then run the request on completion
 	if(!_mIsFacebookLogin)
@@ -311,7 +311,7 @@ static FacebookHelper* gSharedInstance_FacebookHelper = nil;
 						   data:(NSString*)data
 					 completion:(FacebookHelperRequestCompletion)completion
 {
-	__block __typeof__(self) bself = self;
+	__weak __typeof__(self) bself = self;
 
 	// if we are not logged in, we need to start a login and then run the request on completion
 	if(!_mIsFacebookLogin)
@@ -344,7 +344,7 @@ static FacebookHelper* gSharedInstance_FacebookHelper = nil;
 
 	WRDebugLog(@"making fb request");
 	
-	//__block __typeof__(self) bself = self;
+	//__weak __typeof__(self) bself = self;
 	
 	NSDictionary* params = NULL;
 
