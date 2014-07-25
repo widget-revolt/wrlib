@@ -24,9 +24,6 @@
 #import "FacebookHelper.h"
 
 
-//iOS only
-#ifndef ANDROID
-
 #import <FacebookSDK/FacebookSDK.h>
 
 #import "WRUtils.h"
@@ -37,7 +34,7 @@
 #error This file must be compiled with ARC. Either turn on ARC for the project or use -fobjc-arc flag
 #endif
 
-static FacebookHelper* gSharedInstance_FacebookHelper = nil;
+
 
 //////////////////////////////////////////////////////////////////////////
 @interface FacebookHelper ()
@@ -71,13 +68,13 @@ static FacebookHelper* gSharedInstance_FacebookHelper = nil;
 //==============================================================
 + (FacebookHelper*) sharedManager
 {
+	static FacebookHelper* _sharedClient = nil;
 	static dispatch_once_t onceQueue;
-	
     dispatch_once(&onceQueue, ^{
-        gSharedInstance_FacebookHelper = [[FacebookHelper alloc] init];
+        _sharedClient = [[FacebookHelper alloc] init];
     });
 	
-    return gSharedInstance_FacebookHelper;
+    return _sharedClient;
 }
 
 //===========================================================
@@ -358,13 +355,14 @@ static FacebookHelper* gSharedInstance_FacebookHelper = nil;
 		};
 	}
 
-
 	[FBWebDialogs presentRequestsDialogModallyWithSession:nil
 												  message:message
 													title:title
 											   parameters:params
 												  handler:
-		^(FBWebDialogResult result, NSURL *resultURL, NSError *error) {
+		^(FBWebDialogResult result, NSURL *resultURL, NSError *error)
+		{
+		
 			if(error)
 			{
 			  // Case A: Error launching the dialog or sending request.
@@ -539,7 +537,7 @@ static FacebookHelper* gSharedInstance_FacebookHelper = nil;
 	// Were we opened ?
     if(state == FBSessionStateOpen || state == FBSessionStateOpenTokenExtended)
     {
-        WRDebugLog(@"FB sessionStateChanged: FBSessionStateOpen or FBSessionStateOpenTokenExtended - logged in");
+        WRDebugLog(@"FB sessionStateChanged: FBSessionStateOpen || FBSessionStateOpenTokenExtended - user logged in");
 
 #if DEBUG
 		// print out any debug info that requires an active session
@@ -557,7 +555,7 @@ static FacebookHelper* gSharedInstance_FacebookHelper = nil;
     }
     else if(state == FBSessionStateClosedLoginFailed || state == FBSessionStateClosed)
     {
-        WRDebugLog(@"FB sessionStateChanged: FBSessionStateClosedLoginFailed or FBSessionStateClosed - not logged in");
+        WRDebugLog(@"FB sessionStateChanged: FBSessionStateClosedLoginFailed || FBSessionStateClosed - user not logged in");
 
         
         // notify ui of the situation
@@ -811,6 +809,8 @@ static FacebookHelper* gSharedInstance_FacebookHelper = nil;
 - (void) openFBReadSession
 {
     WRDebugLog(@"FB login: openFBReadSession - activeSession nil?: %@", (FBSession.activeSession == nil ? @"Yes" : @"No"));
+	NSString* defaultFBAppId = [FBSettings defaultAppID];
+	WRDebugLog(@">>> FB login - using app id: %@", defaultFBAppId);
 	
 	// if we have an active session, then we need to explicitly clear it here before we reopen
     if (FBSession.activeSession)
@@ -946,4 +946,3 @@ static FacebookHelper* gSharedInstance_FacebookHelper = nil;
 
 @end
 
-#endif //if !ANDROID

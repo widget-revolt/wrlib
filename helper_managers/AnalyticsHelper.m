@@ -26,6 +26,12 @@
 #import "WRLogging.h"
 
 
+#if ! __has_feature(objc_arc)
+#error This file must be compiled with ARC. Either turn on ARC for the project or use -fobjc-arc flag
+#endif
+
+
+
 #if USE_GOOGLE
 #import "GAI.h"
 #endif
@@ -35,17 +41,7 @@
 #import "Flurry.h"
 #endif
 
-#if ! __has_feature(objc_arc)
-#error This file must be compiled with ARC. Either turn on ARC for the project or use -fobjc-arc flag
-#endif
 
-
-
-#ifndef ANDROID
-
-
-
-static AnalyticsHelper* gSharedInstance_AnalyticsHelper = NULL;
 
 /////////////////////////////////////////////////////////////////////
 @interface AnalyticsHelper()
@@ -61,13 +57,14 @@ static AnalyticsHelper* gSharedInstance_AnalyticsHelper = NULL;
 //==============================================================
 + (AnalyticsHelper*) sharedManager
 {
+	static AnalyticsHelper* _sharedClient = NULL;
 	static dispatch_once_t onceQueue;
 	
     dispatch_once(&onceQueue, ^{
-        gSharedInstance_AnalyticsHelper = [[AnalyticsHelper alloc] init];
+        _sharedClient = [[AnalyticsHelper alloc] init];
     });
 	
-    return gSharedInstance_AnalyticsHelper;
+    return _sharedClient;
 }
 
 //===========================================================
@@ -128,27 +125,25 @@ static AnalyticsHelper* gSharedInstance_AnalyticsHelper = NULL;
 	if(flurryKey) {
 		self.mFlurryAPIKey = flurryKey;
 	}
-	
 
 	//[Flurry setCrashReportingEnabled:YES];
 	
 #if DEBUG
 	[Flurry setDebugLogEnabled:TRUE];
+	
+	#ifndef ANDROID
 	[Flurry setLogLevel:FlurryLogLevelDebug];
+	#endif
 	
 	[Flurry setAppVersion:@"666"];//<-- indicates the debug version so we don't pollute flurry versions
 #endif
-	
-	
+
 	[Flurry startSession:_mFlurryAPIKey];
-	
-	
 	
 #endif
 	
 	
 }
-
 
 //===========================================================
 - (void) onAppWillResume:(NSNotification*)notif
@@ -443,4 +438,3 @@ static AnalyticsHelper* gSharedInstance_AnalyticsHelper = NULL;
 
 @end
 
-#endif	//!ANDROID

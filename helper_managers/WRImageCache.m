@@ -22,12 +22,20 @@
 //	THE SOFTWARE.
 
 #import "WRImageCache.h"
-#import "AFHTTPRequestOperationManager.h"
+
 
 //http://www.widgetrevolt.com/site_media/images/theme-pics/services.png
 
 
-static WRImageCache* gSharedInstance_ImageCache = NULL;
+
+#if WRB_USE_AFNETWORKING20
+	#import "AFHTTPRequestOperationManager.h"
+#else
+	#import "AFHTTPClient.h"
+	#import "AFImageRequestOperation.h"
+#endif
+
+
 
 /////////////////////////////////////////////////////////////////////
 @interface WRImageCache()
@@ -43,13 +51,25 @@ static WRImageCache* gSharedInstance_ImageCache = NULL;
 + (WRImageCache*) sharedManager
 {
 	static dispatch_once_t onceQueue;
-	
+	static WRImageCache* _sharedClient = nil;
     dispatch_once(&onceQueue, ^{
-        gSharedInstance_ImageCache = [[WRImageCache alloc] init];
+        _sharedClient = [[WRImageCache alloc] init];
     });
 	
-    return gSharedInstance_ImageCache;
+    return _sharedClient;
 }
+//===========================================================
++ (NSOperationQueue *)imageCacheSharedOperationQueue {
+    static NSOperationQueue *_wrImageCacheRequestOperationQueue = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _wrImageCacheRequestOperationQueue = [[NSOperationQueue alloc] init];
+        [_wrImageCacheRequestOperationQueue setMaxConcurrentOperationCount:NSOperationQueueDefaultMaxConcurrentOperationCount];
+    });
+	
+    return _wrImageCacheRequestOperationQueue;
+}
+
 //===========================================================
 - (void) setDefaultImage:(UIImage*)image
 {
@@ -72,7 +92,6 @@ static WRImageCache* gSharedInstance_ImageCache = NULL;
 }
 
 //===========================================================
-//ANDROID - needs to change
 - (BOOL) cacheImage:(UIImage*)image forURL:(NSURL*)url
 {
 	NSString* fileName = [self sanitizeURL:url];
@@ -93,8 +112,23 @@ static WRImageCache* gSharedInstance_ImageCache = NULL;
 	NSString* fileName = [self sanitizeURL:url];
 	fileName = [fileName stringByAppendingString:@".png"];
 	
+	UIImage* image = NULL;
 	NSURL* fileURL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:fileName]];
-	UIImage* image = [UIImage imageWithData:[NSData dataWithContentsOfURL:fileURL]];
+//WRDebugLog(@"filename: %@", fileName);
+	if(fileURL)
+	{
+//		WRDebugLog(@"file url: %@", fileURL);
+	
+		NSData* imageData = [NSData dataWithContentsOfURL:fileURL];
+		
+//if(!imageData) {
+//WRDebugLog(@"no image data");
+//}
+		if(imageData)
+		{
+			image = [UIImage imageWithData:imageData];
+		}
+	}
 	
 	if(!image)
 	{
@@ -102,22 +136,53 @@ static WRImageCache* gSharedInstance_ImageCache = NULL;
 			image = [_mDefaultImage copy];
 		}
 		
-		// start a load from the url now to fetch the image
 		
+#if WRB_USE_AFNETWORKING20
+		// start a load from the url now to fetch the image
+		NSString* resource = [url resourceSpecifier];
+
 		AFHTTPRequestOperationManager* httpClient = [[AFHTTPRequestOperationManager alloc] initWithBaseURL:url];
 		httpClient.responseSerializer = [AFImageResponseSerializer serializer];
+		[httpClient GET:resource parameters:NULL success:^(AFHTTPRequestOperation *operation, id responseObject)
+		 {
+			 
+			 
+			 
+			 AFImageRequestOperation* imageOp = (AFImageRequestOperation*) operation;
+			 UIImage* responseImage = (UIImage*) responseObject;
+			 if(responseImage) {
+				 [self cacheImage:responseImage forURL:url];
+			 }
+			 
+		 } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+			 WRErrorLog(@"Error fetching image for URL: %@, error: %@", url, error);
+		 }];
+
+#else
+		NSMutableURLRequest* urlRequest = [NSMutableURLRequest requestWithURL:url];
+		[urlRequest addValue:@"image/*" forHTTPHeaderField:@"Accept"];
+		AFImageRequestOperation *requestOperation = [[AFImageRequestOperation alloc] initWithRequest:urlRequest];
+#endif
+
+#ifdef _AFNETWORKING_ALLOW_INVALID_SSL_CERTIFICATES_
+		requestOperation.allowsInvalidSSLCertificate = YES;
+#endif
 		
-		NSString* resource = [url resourceSpecifier];
-		[httpClient GET:resource parameters:NULL success:^(AFHTTPRequestOperation *operation, id responseObject) {
-		
-			UIImage* responseImage = (UIImage*) responseObject;
+        [requestOperation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
+
+			UIImage* responseImage = (UIImage*)  responseObject;
 			if(responseImage) {
 				[self cacheImage:responseImage forURL:url];
 			}
+			
+        } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+            WRErrorLog(@"Error fetching image for URL: %@, error: %@", url, error);
+        }];
 		
-		} failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-			WRErrorLog(@"Error fetching image for URL: %@, error: %@", url, error);
-		}];
+ 
+		
+        [[WRImageCache imageCacheSharedOperationQueue] addOperation:requestOperation];
+		
 	}
 	
 	return image;

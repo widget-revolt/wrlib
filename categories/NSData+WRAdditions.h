@@ -33,6 +33,16 @@
 //--hex
 - (NSString*) stringWithHexBytes;
 
+//--simple encryption
+// This was taken from stackoverflow here:
+// http://stackoverflow.com/questions/8287727/aes256-nsstring-encryption-in-ios?rq=1
+// I would suggest only using it for basic obfuscation
+
+// Be warned that this is pretty insecure.  If you need security, suggest using RNCrypt:
+// http://robnapier.net/aes-commoncrypto/
+
+- (NSData*)AES256EncryptWithKey:(NSString*)key;
+- (NSData*)AES256DecryptWithKey:(NSString*)key;
 
 #define USE_ZLIB 1
 

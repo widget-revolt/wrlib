@@ -24,7 +24,8 @@
 #import <Foundation/Foundation.h>
 
 //This is a braindead simple cache implementation with ZERO cleanup strategy.  It is relying on the good graces of the NSTemporaryDirectory and the iOS system to cleanup these temp files as it see fit.  This is not a workable strategy on android.
-// This class relies on AFNetworking 2.x
+// This class relies on AFNetworking.   If you do not define anything it will use AFNetworking 2.x
+// If you otherwise define WRB_USE_AFNETWORKING20 as 0 then it will use AFNetworking 1.x
 
 @interface WRImageCache : NSObject
 
