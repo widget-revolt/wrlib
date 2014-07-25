@@ -27,8 +27,8 @@
 
 // UUID hashes are created by adding salt + uuid + salt
 
-#define kWRUUID_key_uuid		@"com.widgetrevolt.uuid1"
-#define kWRUUID_key_uuidhash	@"com.widgetrevolt.uuid_hash1"
+#define kWRUUID_key_uuid		@"com.wrbackend.uuid1"
+#define kWRUUID_key_uuidhash	@"com.wrbackend.uuid_hash1"
 
 @interface WRUUID : NSObject
 

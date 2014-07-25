@@ -22,7 +22,10 @@
 //	THE SOFTWARE.
 
 #import "WRInstallTrackerHelper.h"
+
+#ifndef ANDROID
 #define TAPSTREAM	1
+#endif
 
 #if TAPSTREAM
 #import "TSTapstream.h"
@@ -33,7 +36,6 @@
 
 #define kPref_installTrackerInstall		@"wr_tapstream_install_tag"
 
-static WRInstallTrackerHelper* gSharedInstance_WRInstallTrackerHelper = NULL;
 
 //////////////////////////////////////////////////////////////////////
 @interface WRInstallTrackerHelper()
@@ -50,12 +52,12 @@ static WRInstallTrackerHelper* gSharedInstance_WRInstallTrackerHelper = NULL;
 + (WRInstallTrackerHelper*) sharedManager
 {
 	static dispatch_once_t onceQueue;
-	
+	static WRInstallTrackerHelper* _sharedClient = nil;
     dispatch_once(&onceQueue, ^{
-        gSharedInstance_WRInstallTrackerHelper = [[WRInstallTrackerHelper alloc] init];
+        _sharedClient = [[WRInstallTrackerHelper alloc] init];
     });
 	
-    return gSharedInstance_WRInstallTrackerHelper;
+    return _sharedClient;
 }
 
 //===========================================================
